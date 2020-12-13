@@ -10,8 +10,10 @@ public class ClientHandler {
     private Socket socket;
     private DataInputStream in;
     private DataOutputStream out;
+    private String name ="";
+    private int nameNumber;
 
-    public ClientHandler(Server server, Socket socket) {
+    public ClientHandler(Server server, Socket socket, int nameNumber) {
         try {
             this.server = server;
             this.socket = socket;
@@ -21,11 +23,21 @@ public class ClientHandler {
                 try {
                     while (true) {
                         String str = in.readUTF();
-                        System.out.println("Сообщение от клиента: " + str);
+                        System.out.println("user#"+nameNumber+"("+name+")"+": "+str);
                         if (str.equals("/end")) {
                             break;
                         }
-                        server.broadcastMsg(str);
+                        if (str.length()>6 && str.startsWith("/name")){
+                            this.name = str.substring(6).trim();
+                            if (this.name.length()>0){
+                                server.broadcastMsg("user#"+nameNumber+ " установил имя: "+name);
+                                continue;
+                            }
+                        }
+                        //(name.length()>0?name:"user#"+nameNumber)
+                        server.broadcastMsg((name.length()>0?name:"user#"+nameNumber)+": "+str);
+                        //server.broadcastMsg(nameNumber+": "+str);
+                        //server.broadcastMsg(str);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -54,8 +66,9 @@ public class ClientHandler {
     }
 
     public void sendMsg(String msg) {
+
         try {
-            out.writeUTF("ECHO: " + msg);
+            out.writeUTF(msg);
         } catch (IOException e) {
             e.printStackTrace();
         }
