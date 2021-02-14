@@ -12,11 +12,14 @@ public class Server {
         try {
             ServerSocket serverSocket = new ServerSocket(8189);
             clients = new Vector<>();
+            int counter = 1;
             while (true) {
+
                 System.out.println("Ждем подключения клиента");
                 Socket socket = serverSocket.accept();
-                ClientHandler c = new ClientHandler(this, socket);
+                ClientHandler c = new ClientHandler(this, socket, counter);
                 subscribe(c);
+                counter ++;
             }
         } catch (IOException e) {
             e.printStackTrace();
